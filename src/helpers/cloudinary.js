@@ -25,4 +25,20 @@ const uploadImageCloudinary = async (filePath) => {
   }
 };
 
-module.exports = { uploadImageCloudinary };
+const deleteCloudinaryImage = async (cloudinaryPath = "") => {
+  try {
+    const deletefile = await cloudinary.api.delete_resources(
+      ["y0jo5bm65uvxedrd7bix"],
+      {
+        type: "upload",
+        resource_type: "image",
+      }
+    );
+
+    console.log(deletefile);
+  } catch (error) {
+    console.log("Error from cloudinary image deleted funcition", error);
+  }
+};
+
+module.exports = { uploadImageCloudinary, deleteCloudinaryImage };
