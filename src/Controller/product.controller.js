@@ -186,10 +186,15 @@ const updateProductinfo = async (req, res) => {
     if (req.body.category) {
       const findproduct = await productModel.findById(id);
       const findCategory = await categoryModel.findById(findproduct.category);
-      findCategory.product.pop(findproduct._id);
+      findCategory.product.pull(findproduct._id);
       await findCategory.save();
+
+      // now update the category productid
+      const updateCategory = await categoryModel.findById(req.body.category);
+
+      updateCategory.product.push(findproduct._id);
+      await updateCategory.save();
     }
-    return;
     const product = await productModel.findByIdAndUpdate(
       id,
       { ...req.body },
@@ -220,9 +225,108 @@ const updateProductinfo = async (req, res) => {
   }
 };
 
+// update image
+const updateImage = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!req.files?.image) {
+      return res
+        .status(401)
+        .json(new apiError(false, `Image information Missing`, 401, null));
+    }
+
+    const product = await productModel.findById(id);
+    if (!product) {
+      return res
+        .status(501)
+        .json(new apiError(false, `Product not found`, 501, null));
+    }
+    if (!req.body.imageUrl) {
+      return res
+        .status(501)
+        .json(new apiError(false, `Imgae Link Missing`, 501, null));
+    }
+    for (let image of req.body.imageUrl) {
+      const item = image.split("/");
+      const lastitem = item[item.length - 1];
+      const actualClodinaryUrl = lastitem.split(".")[0];
+      await deleteCloudinaryImage(actualClodinaryUrl);
+    }
+
+    // now delte the image url in database
+    product.image.pull(...req.body.imageUrl);
+    await product.save();
+
+    // now upload the new image
+    let coludinaryImage = [];
+    for (let image of req.files?.image) {
+      const { url } = await uploadImageCloudinary(image.path);
+      coludinaryImage.push(url);
+    }
+
+    // now update the image in database
+    product.image.push(...coludinaryImage);
+    await product.save();
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          false,
+          "Product Image Updated Successfull",
+          200,
+          product
+        )
+      );
+  } catch (error) {
+    return res
+      .status(501)
+      .json(
+        new apiError(
+          false,
+          `Image Update controller error : ${error}`,
+          501,
+          null
+        )
+      );
+  }
+};
+
+// single product controller
+const singleproduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await productModel
+      .findById(id)
+      .populate(["category", "subCategory"]);
+    if (!product) {
+      return res
+        .status(501)
+        .json(new apiError(false, `Product not found`, 501, null));
+    }
+    return res
+      .status(200)
+      .json(new ApiResponse(false, "Product Found", 200, product));
+  } catch (error) {
+    return res
+      .status(501)
+      .json(
+        new apiError(
+          false,
+          `Single Product controller error : ${error}`,
+          501,
+          null
+        )
+      );
+  }
+};
+
 module.exports = {
   createProduct,
   getAllproduct,
   categoryWiseProduct,
   updateProductinfo,
+  updateImage,
+  singleproduct,
 };

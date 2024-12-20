@@ -35,7 +35,7 @@ const deleteCloudinaryImage = async (cloudinaryPath = "") => {
       }
     );
 
-    console.log(deletefile);
+    return deletefile;
   } catch (error) {
     console.log("Error from cloudinary image deleted funcition", error);
   }
