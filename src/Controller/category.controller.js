@@ -60,7 +60,7 @@ const categorycontroller = async (req, res) => {
 // get all category
 const getAllCategory = async (req, res) => {
   try {
-    const allCategory = await categoryModel.find({});
+    const allCategory = await categoryModel.find({}).populate("subcategory");
     if (!allCategory) {
       return res
         .status(401)
