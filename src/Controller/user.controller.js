@@ -13,9 +13,9 @@ const { generateToken } = require("../helpers/jwtToken");
 
 const registration = async (req, res) => {
   try {
-    const { firstName, email, phoneNumber, adress1, password } = req.body;
+    const { firstName, email, phoneNumber, password } = req.body;
 
-    if (!firstName || !email || !phoneNumber || !adress1 || !password) {
+    if (!firstName || !email || !phoneNumber || !password) {
       return res
         .status(401)
         .json(
@@ -59,7 +59,6 @@ const registration = async (req, res) => {
       firstName: firstName,
       email: email,
       phoneNumber: phoneNumber,
-      adress1: adress1,
       password: hashPassword,
       otp: Otp,
       otpExpireTime: otpExpireTime,
