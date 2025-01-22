@@ -1,6 +1,7 @@
 const { ApiResponse } = require("../Utils/Apiresponse");
 const { apiError } = require("../Utils/ApiErrorResponse");
 const usermodel = require("../Model/User.model");
+const { resetEmail } = require("../helpers/resetSendMail");
 const {
   emailValidator,
   passwordChecker,
@@ -156,7 +157,7 @@ const verifyOtp = async (req, res) => {
 
     if (checkIsUserAlradyRegister) {
       if (
-        checkIsUserAlradyRegister.otp === otp &&
+        checkIsUserAlradyRegister.otp === parseInt(otp) &&
         new Date().getTime() <= checkIsUserAlradyRegister.otpExpireTime
       ) {
         // remove otp and otpExpireTime removed from database
@@ -168,15 +169,16 @@ const verifyOtp = async (req, res) => {
         return res
           .status(200)
           .json(new ApiResponse(false, "User Verified Sucessfull", 200, null));
-      } else {
-        // remove otp and otpExpireTime removed from database
-        checkIsUserAlradyRegister.otp = null;
-        checkIsUserAlradyRegister.otpExpireTime = null;
-        await checkIsUserAlradyRegister.save();
-        return res
-          .status(401)
-          .json(new ApiResponse(false, "Otp time Expired ", 200, null));
       }
+      // else {
+      //   // remove otp and otpExpireTime removed from database
+      //   checkIsUserAlradyRegister.otp = null;
+      //   checkIsUserAlradyRegister.otpExpireTime = null;
+      //   await checkIsUserAlradyRegister.save();
+      return res
+        .status(401)
+        .json(new ApiResponse(false, "Otp Not Match ", 200, null));
+      // }
     }
   } catch (error) {
     return res
@@ -233,6 +235,50 @@ const resendOpt = async (req, res) => {
   }
 };
 
+// forgot password
+const forgotpassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res
+        .status(401)
+        .json(
+          new apiError(
+            false,
+            `forgotpassword password  credential Missing!! `,
+            401,
+            null
+          )
+        );
+    }
+
+    const finduser = await usermodel.findOne({ email: email });
+    if (!finduser) {
+      return res.status(301).redirect("http://localhost:5173/login");
+    }
+
+    // send a verification to user
+    const resetEmailinfo = await resetEmail(email, finduser.firstName);
+    if (!resetEmailinfo?.length) {
+      return res
+        .status(501)
+        .json(
+          new apiError(false, "Failed to send Verification Eamil", 501, null)
+        );
+    }
+  } catch (error) {
+    return res
+      .status(501)
+      .json(
+        new apiError(
+          false,
+          `Error from forgot password controller  ${error}`,
+          501,
+          null
+        )
+      );
+  }
+};
 // reset password controller
 const resetPassword = async (req, res) => {
   try {
@@ -308,4 +354,11 @@ const resetPassword = async (req, res) => {
   }
 };
 
-module.exports = { registration, login, verifyOtp, resendOpt, resetPassword };
+module.exports = {
+  registration,
+  login,
+  verifyOtp,
+  resendOpt,
+  resetPassword,
+  forgotpassword,
+};
