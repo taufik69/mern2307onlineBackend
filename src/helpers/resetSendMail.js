@@ -1,5 +1,5 @@
 const nodemailer = require("nodemailer");
-const { emailTemplate } = require("../helpers/Template");
+const { resetPasswordTemplate } = require("../helpers/Template");
 // configure node mailer
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -11,15 +11,14 @@ const transporter = nodemailer.createTransport({
 
 // make a emailSend functionn
 
-const sendEmail = async (email, Otp, firstName) => {
+const resetEmail = async (email, firstName) => {
   try {
     const info = await transporter.sendMail({
       from: "Es MERN 2307  👻",
       to: email,
-      subject: "Verification Email ✔",
-      html: emailTemplate(
-        Otp,
-        `http://localhost:5173/verifyotp/${email}`,
+      subject: "Reset Your Password ✔",
+      html: resetPasswordTemplate(
+        `http://localhost:5173/resetpassword/${email}`,
         firstName
       ),
     });
@@ -31,4 +30,4 @@ const sendEmail = async (email, Otp, firstName) => {
   }
 };
 
-module.exports = { sendEmail };
+module.exports = { resetEmail };

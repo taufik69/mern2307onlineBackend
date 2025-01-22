@@ -2,6 +2,7 @@ const { ApiResponse } = require("../Utils/Apiresponse");
 const { apiError } = require("../Utils/ApiErrorResponse");
 const productModel = require("../Model/product.model");
 const categoryModel = require("../Model/category.model");
+const subcategorModel = require("../Model/subcategory.model");
 const {
   uploadImageCloudinary,
   deleteCloudinaryImage,
@@ -62,6 +63,11 @@ const createProduct = async (req, res) => {
       const searchCategory = await categoryModel.findById(category);
       searchCategory.product.push(saveData._id);
       await searchCategory.save();
+
+      // now save the prouct in to subcategory
+      const findsubcategory = await subcategorModel.findById(subCategory);
+      findsubcategory.product.push(saveData._id);
+      await findsubcategory.save();
       return res
         .status(200)
         .json(
@@ -297,9 +303,13 @@ const updateImage = async (req, res) => {
 const singleproduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await productModel
-      .findById(id)
-      .populate(["category", "subCategory"]);
+    const product = await productModel.findById(id).populate({
+      path: "category",
+      select: "-createdAt -updatedAt",
+      populate: {
+        path: "product",
+      },
+    });
     if (!product) {
       return res
         .status(501)

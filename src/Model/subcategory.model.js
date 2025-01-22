@@ -12,6 +12,12 @@ const subcategorySchmea = new Schema(
       type: Schema.Types.ObjectId,
       ref: "category",
     },
+    product: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "product",
+      },
+    ],
   },
   {
     timestamps: true,

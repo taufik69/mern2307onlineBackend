@@ -125,7 +125,7 @@ const login = async (req, res) => {
     if (token) {
       return res
         .status(200)
-        .cookie("token", token, { http: true, secure: true })
+        .cookie("token", token, { httpOnly: true, secure: false })
         .json(
           new ApiResponse(false, "User Login Sucessfull", 200, {
             token: `Bearar ${token}`,
