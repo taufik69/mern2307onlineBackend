@@ -5,11 +5,13 @@ const categoryRoutes = require("./Api/category.apiRoutes");
 const subcategoryRoutes = require("./Api/subcategory.apiRoutes");
 const productRoutes = require("./Api/product.apiRoutes");
 const bannerRoutes = require("./Api/banner.apoRoutes");
+const cartRoutes = require("./Api/cart.apiRoutes");
 _.use("/api/v1", userRoutes);
 _.use("/api/v1", categoryRoutes);
 _.use("/api/v1", subcategoryRoutes);
 _.use("/api/v1", productRoutes);
 _.use("/api/v1", bannerRoutes);
+_.use("/api/v1", cartRoutes);
 
 _.use("*", (req, res) => {
   res.send("you route is invalid");
