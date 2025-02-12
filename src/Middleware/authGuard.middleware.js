@@ -23,10 +23,10 @@ const authGuard = async (req, res, next) => {
       req.user = decoded;
       next();
     } else {
-      return res.status(401).josn({ msg: "Your Token is Missing " });
+      res.status(401).josn({ msg: "Your Token is Missing " });
     }
   } catch (error) {
-    console.error("from authguard middleware", error);
+    console.error("from authguard middleware", error.message);
   }
 };
 

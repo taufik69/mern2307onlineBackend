@@ -114,7 +114,7 @@ const deltecartItem = async (req, res) => {
 
 const usercartitem = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.user;
     const specificuserCartitem = await cartModel
       .find({ user: id })
       .populate({
@@ -154,4 +154,4 @@ const usercartitem = async (req, res) => {
       );
   }
 };
-module.exports = { addtoCart, getAllCartItem, deltecartItem  ,usercartitem};
+module.exports = { addtoCart, getAllCartItem, deltecartItem, usercartitem };
