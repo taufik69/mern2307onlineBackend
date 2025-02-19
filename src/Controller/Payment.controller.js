@@ -4,9 +4,7 @@ const OrderModel = require("../Model/order.model");
 
 const success = async (req, res) => {
   try {
-    return res
-      .status(200)
-      .json(new ApiResponse(false, "payement Successfull", 200, null));
+    res.redirect("http://localhost:5173/paymentSucess");
   } catch (error) {
     return res
       .status(501)
